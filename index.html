@@ -161,5 +161,25 @@
 
     input.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){e.preventDefault(); send.click()}});
   </script>
+  <!-- Section Contact -->
+<section id="contact" style="text-align:center; padding: 50px;">
+  <h2>Contactez-moi</h2>
+  <p>Envoyez-moi un message directement depuis ce formulaire :</p>
+
+  <form action="https://formspree.io/f/xqaywpra" method="POST" style="max-width:400px;margin:auto;">
+    <label for="name">Nom :</label><br>
+    <input type="text" name="name" id="name" required style="width:100%;padding:8px;margin:6px 0;"><br>
+
+    <label for="email">Email :</label><br>
+    <input type="email" name="_replyto" id="email" required style="width:100%;padding:8px;margin:6px 0;"><br>
+
+    <label for="message">Message :</label><br>
+    <textarea name="message" id="message" rows="5" required style="width:100%;padding:8px;margin:6px 0;"></textarea><br>
+
+    <button type="submit" style="padding:10px 20px;background:#007BFF;color:white;border:none;border-radius:5px;cursor:pointer;">Envoyer</button>
+  </form>
+</section>
+
 </body>
 </html>
+
