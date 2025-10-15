@@ -49,7 +49,7 @@
 
         <div class="features" id="features">
           <div class="card"><strong>Page produit</strong><div>Présente tes modules (Chat, MLOps, Vision).</div></div>
-          <div class="card"><strong>Démo interactive</strong><div>Chat simulé ou connecté à Hugging Face Space.</div></div>
+          <div class="card"><strong>Démo interactive</strong><div>Chat connecté à Hugging Face Space.</div></div>
           <div class="card"><strong>Formulaire</strong><div>Contact via Formspree (gratuit).</div></div>
         </div>
       </div>
@@ -58,27 +58,25 @@
         <div class="chat card">
           <div style="font-weight:700">Démo Chat • MVP</div>
           <div class="messages" id="messages">
-            <div class="msg bot">Bonjour ! C'est une démo. Pose-moi une question sur l'IA ou écris "connecter" pour brancher une vraie API.</div>
+            <div class="msg bot">Bonjour ! Pose-moi une question sur l'IA.</div>
           </div>
           <div class="inputRow">
-            <input id="q" type="text" placeholder="Écris un message (ex: Qu'est-ce que Abacus.ai ?)">
+            <input id="userInput" type="text" placeholder="Écris un message (ex: Qu'est-ce que Abacus.ai ?)">
             <button id="send" class="cta">Envoyer</button>
           </div>
         </div>
-        <small style="display:block;margin-top:8px;color:#475569">Réponses simulées — pour connecter une API vraie voir la section « Option avancée » ci-dessous.</small>
       </div>
     </section>
 
     <section style="margin-top:28px" id="contact">
       <div class="card">
         <h3>Contact rapide</h3>
-        <form id="contactForm" action="https://formspree.io/f/TON_FORM_ID" method="POST">
+        <form id="contactForm" action="https://formspree.io/f/xqaywpra" method="POST">
           <label>Nom<br><input name="name" required></label><br><br>
           <label>Email<br><input name="email" type="email" required></label><br><br>
           <label>Message<br><textarea name="message" rows="4" required></textarea></label><br><br>
           <button class="cta" type="submit">Envoyer</button>
         </form>
-        <small style="color:#64748b">Remplace `TON_FORM_ID` par ton ID Formspree (explication plus bas).</small>
       </div>
     </section>
   </main>
@@ -87,7 +85,7 @@
 
   <script>
     const messagesEl = document.getElementById('messages');
-    const input = document.getElementById('q');
+    const input = document.getElementById('userInput');
     const send = document.getElementById('send');
 
     function append(role, text){
@@ -98,53 +96,21 @@
       messagesEl.scrollTop = messagesEl.scrollHeight;
     }
 
-    // UTIL: appeler une API d'inférence (Hugging Face Inference ou mock)
     async function callInferenceAPI(userText){
-      // --- OPTION A: appeler un Hugging Face Space public (CORS autorisé) ---
-      // Si tu as mis ton endpoint d'espace HF dans `HF_SPACE_ENDPOINT` (ex: https://huggingface.co/spaces/username/mon-space/ + '/api/predict')
       const HF_SPACE_ENDPOINT = 'https://huggingface.co/spaces/Luisaugxx/Luisaugxx/+/api/predict';
       if(HF_SPACE_ENDPOINT){
         try{
           const resp = await fetch(HF_SPACE_ENDPOINT, {
-            method: 'POST',
-            headers: {'Content-Type':'application/json'},
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
             body: JSON.stringify({data:[userText]})
           });
           const j = await resp.json();
-          // format selon ton Space ; souvent j.data[0] ou j[0]
           if(j && j.data) return String(j.data[0] || j[0]);
           return JSON.stringify(j);
         }catch(e){ return "Erreur API: "+e.message }
       }
-
-      // --- OPTION B: Hugging Face Inference HTTP API (nécessite API token) ---
-      const HF_INFERENCE_ENDPOINT = ''; // ex: "https://api-inference.huggingface.co/models/xxx"
-      const HF_TOKEN = ''; // si tu veux utiliser ce chemin, colle ton token ici (NON recommandé pour front-end public)
-      if(HF_INFERENCE_ENDPOINT && HF_TOKEN){
-        try{
-          const resp = await fetch(HF_INFERENCE_ENDPOINT, {
-            method:'POST',
-            headers: {'Authorization':'Bearer '+HF_TOKEN,'Content-Type':'application/json'},
-            body: JSON.stringify({inputs: userText})
-          });
-          const j = await resp.json();
-          // format dépend du modèle
-          if(Array.isArray(j) && j.length>0 && j[0].generated_text) return j[0].generated_text;
-          if(j && j[0] && j[0].generated_text) return j[0].generated_text;
-          return JSON.stringify(j);
-        }catch(e){ return "Erreur API: "+e.message }
-      }
-
-      // --- OPTION C: fallback local simulé ---
-      return simulateReply(userText);
-    }
-
-    function simulateReply(text){
-      text = text.trim().toLowerCase();
-      if(!text) return "Dis quelque chose :)";
-      if(text.includes('abacus')) return "Abacus.ai est une plateforme MLOps & agents — visite abacus.ai pour plus d'infos.";
-      if(text.includes('connecter')) return "Pour connecter une vraie API: crée un Hugging Face Space (gratuit) et colle son endpoint ici (HF_SPACE_ENDPOINT). Je te montre comment.";
-      return "Réponse simulée à : " + text;
+      return "Impossible de joindre le modèle.";
     }
 
     send.addEventListener('click', async ()=> {
@@ -153,35 +119,12 @@
       append('user', v);
       input.value = '';
       append('bot', '…');
-      // Remplacer par callInferenceAPI pour vraie IA
       const reply = await callInferenceAPI(v);
       const last = messagesEl.querySelectorAll('.msg.bot');
       last[last.length-1].textContent = reply;
     });
 
-    input.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){e.preventDefault(); send.click()}});
+    input.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){e.preventDefault(); send.click() } });
   </script>
-  <!-- Section Contact -->
-<section id="contact" style="text-align:center; padding: 50px;">
-  <h2>Contactez-moi</h2>
-  <p>Envoyez-moi un message directement depuis ce formulaire :</p>
-
-  <form action="https://formspree.io/f/xqaywpra" method="POST" style="max-width:400px;margin:auto;">
-    <label for="name">Nom :</label><br>
-    <input type="text" name="name" id="name" required style="width:100%;padding:8px;margin:6px 0;"><br>
-
-    <label for="email">Email :</label><br>
-    <input type="email" name="_replyto" id="email" required style="width:100%;padding:8px;margin:6px 0;"><br>
-
-    <label for="message">Message :</label><br>
-    <textarea name="message" id="message" rows="5" required style="width:100%;padding:8px;margin:6px 0;"></textarea><br>
-
-    <button type="submit" style="padding:10px 20px;background:#007BFF;color:white;border:none;border-radius:5px;cursor:pointer;">Envoyer</button>
-  </form>
-</section>
-
 </body>
 </html>
-
-
-
