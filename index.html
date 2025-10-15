@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>TonAI • MVP</title>
+  <style>
+    :root{--accent:#0b63d6;--bg:#f7fafc;--card:#ffffff}
+    body{margin:0;font-family:Inter,system-ui,Arial,sans-serif;background:var(--bg);color:#0b1220}
+    header{background:linear-gradient(90deg,#fff 0%,#f0f6ff 100%);padding:28px 20px;box-shadow:0 2px 6px rgba(10,20,40,0.06)}
+    .container{max-width:1000px;margin:0 auto}
+    .nav{display:flex;justify-content:space-between;align-items:center}
+    .brand{font-weight:700;color:var(--accent);font-size:20px}
+    .hero{display:flex;gap:28px;align-items:center;padding:48px 0}
+    .hero-left{flex:1}
+    h1{margin:0 0 12px;font-size:32px}
+    p.lead{margin:0 0 20px;color:#334155}
+    .cta{display:inline-block;background:var(--accent);color:white;padding:12px 18px;border-radius:8px;text-decoration:none}
+    .features{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:20px}
+    .card{background:var(--card);padding:16px;border-radius:10px;box-shadow:0 6px 18px rgba(12,20,40,0.06)}
+    .demo{flex:1;min-width:320px}
+    .chat{height:420px;background:#0f1724;color:white;border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:10px}
+    .messages{flex:1;overflow:auto}
+    .msg{padding:8px;border-radius:8px;margin-bottom:8px;max-width:80%}
+    .user{align-self:flex-end;background:#e2f0ff;color:#022a62}
+    .bot{align-self:flex-start;background:#111827}
+    .inputRow{display:flex;gap:8px;margin-top:8px}
+    input[type="text"]{flex:1;padding:10px;border-radius:8px;border:1px solid #dbe7ff}
+    footer{padding:20px;text-align:center;color:#6b7280}
+    @media(max-width:800px){.hero{flex-direction:column}.demo{order:2}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container nav">
+      <div class="brand">TonAI • MVP</div>
+      <nav>
+        <a href="#features">Fonctionnalités</a> · <a href="#demo">Démo</a> · <a href="#contact">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero" id="home">
+      <div class="hero-left">
+        <h1>Crée ton site AI — rapide, propre, gratuit</h1>
+        <p class="lead">Landing page + démonstration interactive. Pas de coûts initiaux — déployable sur GitHub Pages / Netlify / Vercel. Idéal pour présenter une offre “AI super-assistant” MVP.</p>
+        <a class="cta" href="#demo">Tester la démo</a>
+
+        <div class="features" id="features">
+          <div class="card"><strong>Page produit</strong><div>Présente tes modules (Chat, MLOps, Vision).</div></div>
+          <div class="card"><strong>Démo interactive</strong><div>Chat simulé ou connecté à Hugging Face Space.</div></div>
+          <div class="card"><strong>Formulaire</strong><div>Contact via Formspree (gratuit).</div></div>
+        </div>
+      </div>
+
+      <div class="demo" id="demo">
+        <div class="chat card">
+          <div style="font-weight:700">Démo Chat • MVP</div>
+          <div class="messages" id="messages">
+            <div class="msg bot">Bonjour ! C'est une démo. Pose-moi une question sur l'IA ou écris "connecter" pour brancher une vraie API.</div>
+          </div>
+          <div class="inputRow">
+            <input id="q" type="text" placeholder="Écris un message (ex: Qu'est-ce que Abacus.ai ?)">
+            <button id="send" class="cta">Envoyer</button>
+          </div>
+        </div>
+        <small style="display:block;margin-top:8px;color:#475569">Réponses simulées — pour connecter une API vraie voir la section « Option avancée » ci-dessous.</small>
+      </div>
+    </section>
+
+    <section style="margin-top:28px" id="contact">
+      <div class="card">
+        <h3>Contact rapide</h3>
+        <form id="contactForm" action="https://formspree.io/f/TON_FORM_ID" method="POST">
+          <label>Nom<br><input name="name" required></label><br><br>
+          <label>Email<br><input name="email" type="email" required></label><br><br>
+          <label>Message<br><textarea name="message" rows="4" required></textarea></label><br><br>
+          <button class="cta" type="submit">Envoyer</button>
+        </form>
+        <small style="color:#64748b">Remplace `TON_FORM_ID` par ton ID Formspree (explication plus bas).</small>
+      </div>
+    </section>
+  </main>
+
+  <footer><div class="container">© TonAI — MVP • Déployable gratuitement sur GitHub Pages / Vercel / Netlify</div></footer>
+
+  <script>
+    const messagesEl = document.getElementById('messages');
+    const input = document.getElementById('q');
+    const send = document.getElementById('send');
+
+    function append(role, text){
+      const d = document.createElement('div');
+      d.className = 'msg ' + (role === 'user' ? 'user' : 'bot');
+      d.textContent = text;
+      messagesEl.appendChild(d);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    // UTIL: appeler une API d'inférence (Hugging Face Inference ou mock)
+    async function callInferenceAPI(userText){
+      // --- OPTION A: appeler un Hugging Face Space public (CORS autorisé) ---
+      // Si tu as mis ton endpoint d'espace HF dans `HF_SPACE_ENDPOINT` (ex: https://huggingface.co/spaces/username/mon-space/ + '/api/predict')
+      const HF_SPACE_ENDPOINT = ''; // <-- colle ici l'URL de ton space + '/api/predict' si tu en as un
+      if(HF_SPACE_ENDPOINT){
+        try{
+          const resp = await fetch(HF_SPACE_ENDPOINT, {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({data:[userText]})
+          });
+          const j = await resp.json();
+          // format selon ton Space ; souvent j.data[0] ou j[0]
+          if(j && j.data) return String(j.data[0] || j[0]);
+          return JSON.stringify(j);
+        }catch(e){ return "Erreur API: "+e.message }
+      }
+
+      // --- OPTION B: Hugging Face Inference HTTP API (nécessite API token) ---
+      const HF_INFERENCE_ENDPOINT = ''; // ex: "https://api-inference.huggingface.co/models/xxx"
+      const HF_TOKEN = ''; // si tu veux utiliser ce chemin, colle ton token ici (NON recommandé pour front-end public)
+      if(HF_INFERENCE_ENDPOINT && HF_TOKEN){
+        try{
+          const resp = await fetch(HF_INFERENCE_ENDPOINT, {
+            method:'POST',
+            headers: {'Authorization':'Bearer '+HF_TOKEN,'Content-Type':'application/json'},
+            body: JSON.stringify({inputs: userText})
+          });
+          const j = await resp.json();
+          // format dépend du modèle
+          if(Array.isArray(j) && j.length>0 && j[0].generated_text) return j[0].generated_text;
+          if(j && j[0] && j[0].generated_text) return j[0].generated_text;
+          return JSON.stringify(j);
+        }catch(e){ return "Erreur API: "+e.message }
+      }
+
+      // --- OPTION C: fallback local simulé ---
+      return simulateReply(userText);
+    }
+
+    function simulateReply(text){
+      text = text.trim().toLowerCase();
+      if(!text) return "Dis quelque chose :)";
+      if(text.includes('abacus')) return "Abacus.ai est une plateforme MLOps & agents — visite abacus.ai pour plus d'infos.";
+      if(text.includes('connecter')) return "Pour connecter une vraie API: crée un Hugging Face Space (gratuit) et colle son endpoint ici (HF_SPACE_ENDPOINT). Je te montre comment.";
+      return "Réponse simulée à : " + text;
+    }
+
+    send.addEventListener('click', async ()=> {
+      const v = input.value;
+      if(!v) return;
+      append('user', v);
+      input.value = '';
+      append('bot', '…');
+      // Remplacer par callInferenceAPI pour vraie IA
+      const reply = await callInferenceAPI(v);
+      const last = messagesEl.querySelectorAll('.msg.bot');
+      last[last.length-1].textContent = reply;
+    });
+
+    input.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){e.preventDefault(); send.click()}});
+  </script>
+</body>
+</html>
