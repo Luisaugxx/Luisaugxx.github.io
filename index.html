@@ -102,7 +102,7 @@
     async function callInferenceAPI(userText){
       // --- OPTION A: appeler un Hugging Face Space public (CORS autorisé) ---
       // Si tu as mis ton endpoint d'espace HF dans `HF_SPACE_ENDPOINT` (ex: https://huggingface.co/spaces/username/mon-space/ + '/api/predict')
-      const HF_SPACE_ENDPOINT = 'https://huggingface.co/spaces/Luisaugxx/Luisaugxx/+/api/predict').;
+      const HF_SPACE_ENDPOINT = 'https://huggingface.co/spaces/Luisaugxx/Luisaugxx/+/api/predict';
       if(HF_SPACE_ENDPOINT){
         try{
           const resp = await fetch(HF_SPACE_ENDPOINT, {
@@ -182,5 +182,6 @@
 
 </body>
 </html>
+
 
 
